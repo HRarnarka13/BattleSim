@@ -158,6 +158,25 @@ public class AgentFresco extends Agent {
         return bestCard;
     }
 
+    /**
+     *
+     * @param selected
+     * @param sb
+     * @return
+     */
+    private boolean opponentAttackWillHit(Card selected, StateBattle sb) {
+        Card ourMove = new CardRest();
+        Card [] move = new Card[2];
+        move[m_noThisAgent] = ourMove;
+        move[m_noOpponentAgent] = selected;
+        int aCurrHealthPoints = sb.getAgentState(m_noThisAgent).getHealthPoints();
+        sb.play(move);
+        if(aCurrHealthPoints < sb.getAgentState(m_noThisAgent).getHealthPoints()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     // endregion
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
@@ -219,16 +238,18 @@ public class AgentFresco extends Agent {
 
             // What to do if the opponent is likely to attack
             Card.CardActionType cardType = selected.getType();
-            if(cardType.equals(Card.CardActionType.ctAttack)) { // Opponent about to attack
-                // TODO : do clever stuff
-                Card defend = new CardDefend();
-                for(Card c : cards){
-                    if (c.getType().equals(Card.CardActionType.ctDefend)) {
-                        // find the best defence card if there are many?
-                        System.out.println(c.getName());
-                        return c;
+            if(cardType.equals(Card.CardActionType.ctAttack)) {// Opponent about to attack
+                if(opponentAttackWillHit(selected, sb)) {
+                    // if we are stronger, attack
+                    if (a.getStaminaPoints() > o.getStaminaPoints() && a.getHealthPoints() > o.getHealthPoints()) {
+                        return whichAttackToUse(attackCards, a, o, sb, selected);
+                    } else {
+                        return minimizeDistanceCard(cards, sb, selected); // DANCE, dodge the attack
                     }
+                } else {
+                    whichAttackToUse(attackCards, a, o, sb, selected);
                 }
+
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
                 if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
                     return new CardRest(); // if the agent benefits from resting, the agent rests
