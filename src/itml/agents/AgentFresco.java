@@ -134,7 +134,7 @@ public class AgentFresco extends Agent {
         Card [] move = new Card[2];
         move[m_noOpponentAgent] = predictedCard;
         move[m_noThisAgent] = restCard;
-        ArrayList<Card> cardsThatHit = new ArrayList<Card>();
+        ArrayList<Card> cardsThatHit = new ArrayList<>();
         // play his card and a rest card
         StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
         bs.play(move);
@@ -218,10 +218,10 @@ public class AgentFresco extends Agent {
                 if (selected.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())) {
                     // TODO: pick best attack card
                 } else if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
-                    // if we benefit from resting
-                    return new CardRest();
+                    return new CardRest(); // if the agent benefits from resting, the agent rests
                 } else { // Move closer to the opponent
                     // TODO: pick best move card
+                    return minimizeDistanceCard(cards, bs, selected);
                 }
 
             } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
