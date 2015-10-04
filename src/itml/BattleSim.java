@@ -27,7 +27,7 @@ public class BattleSim {
      *  This is the main routine.
      *
      * @param  args  Command line arguments
-     *
+     *bla
      *      itml.BattleSim  [ <numSteps> <numTrainingGames> <numPlayingGames> </numPlayingGames><msConstuctor> <msPerMove> <msLearning> ]
      */
 	public static void main(String [] args)
