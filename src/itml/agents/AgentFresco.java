@@ -180,7 +180,7 @@ public class AgentFresco extends Agent {
 
     @Override
     public Card act(StateBattle stateBattle) {
-        StateBattle bs = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
+        StateBattle sb = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
         double[] values = new double[8];
         StateAgent a = stateBattle.getAgentState(0);
         StateAgent o = stateBattle.getAgentState(1);
@@ -232,11 +232,11 @@ public class AgentFresco extends Agent {
                 }
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
                 if (selected.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())) {
-                    return new CardRest(); //
+                    return whichAttackToUse(attackCards, a, o, sb, selected);
                 } else if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
                     return new CardRest(); // if the agent benefits from resting, the agent rests
                 } else { // Move closer to the opponent
-                    return minimizeDistanceCard(cards, bs, selected); // return the best move card
+                    return minimizeDistanceCard(cards, sb, selected); // return the best move card
                 }
 
             } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
