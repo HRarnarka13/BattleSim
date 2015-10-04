@@ -12,6 +12,7 @@ import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import javax.swing.plaf.synth.Region;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,42 @@ public class AgentFresco extends Agent {
     private final int GRID_SIZE = 4;
 
     private enum Direction {RIGHT, LEFT, UP, DOWN}
+
+    // region Helpers
+    
+    /**
+     * This function returns how many tiles a player can move in a given direction without
+     * going out of the grid.
+     * @param col the current column of the player
+     * @param row the current row of the player
+     * @param direction the direction we want to move to.
+     * @return How many tiles can we move over without going out of the grid
+     */
+    private int distanceFromEdge(int col, int row, Direction direction) {
+        switch (direction) {
+            case RIGHT:
+                return GRID_SIZE - col;
+            case LEFT:
+                return Math.abs(0 - col);
+            case UP:
+                return GRID_SIZE - row;
+            case DOWN:
+                return Math.abs(0 - row);
+            default:
+                throw new IllegalArgumentException("Illegal direction.");
+        }
+    }
+
+    /**
+     * This function decides whether a player can play a particular card or not,
+     * depending on his stamina and the staminaPoints of the card.
+     * @param stamina The current stamina of the player in question.
+     * @param card The card the player wants to play.
+     * @return If the player has got enough stamina to play the card.
+     */
+    private boolean enoughStamina(int stamina, Card card) {
+        return (card.getStaminaPoints() > stamina);
+    }
 
     /**
      * Calculates the distance between two agents
@@ -62,6 +99,8 @@ public class AgentFresco extends Agent {
         }
         return bestCard;
     }
+
+    // endregion
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
@@ -124,40 +163,6 @@ public class AgentFresco extends Agent {
             System.out.println("Error classifying new instance: " + e.toString());
         }
         return new CardRest();  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    /**
-     * This function returns how many tiles a player can move in a given direction without
-     * going out of the grid.
-     * @param col the current column of the player
-     * @param row the current row of the player
-     * @param direction the direction we want to move to.
-     * @return How many tiles can we move over without going out of the grid
-     */
-    private int distanceFromEdge(int col, int row, Direction direction) {
-        switch (direction) {
-            case RIGHT:
-                return GRID_SIZE - col;
-            case LEFT:
-                return Math.abs(0 - col);
-            case UP:
-                return GRID_SIZE - row;
-            case DOWN:
-                return Math.abs(0 - row);
-            default:
-                throw new IllegalArgumentException("Illegal direction.");
-        }
-    }
-
-    /**
-     * This function decides whether a player can play a particular card or not,
-     * depending on his stamina and the staminaPoints of the card.
-     * @param stamina The current stamina of the player in question.
-     * @param card The card the player wants to play.
-     * @return If the player has got enough stamina to play the card.
-     */
-    private boolean enoughStamina(int stamina, Card card) {
-        return (card.getStaminaPoints() > stamina);
     }
 
     @Override
