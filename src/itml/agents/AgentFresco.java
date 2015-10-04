@@ -180,7 +180,7 @@ public class AgentFresco extends Agent {
 
     @Override
     public Card act(StateBattle stateBattle) {
-        StateBattle bs = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
+        StateBattle sb = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
         double[] values = new double[8];
         StateAgent a = stateBattle.getAgentState(0);
         StateAgent o = stateBattle.getAgentState(1);
@@ -195,10 +195,30 @@ public class AgentFresco extends Agent {
         try {
             ArrayList<Card> allCards = m_deck.getCards(); // all cards
             ArrayList<Card> cards = m_deck.getCards(a.getStaminaPoints());// cards that we have stamina to use
+
+            ArrayList<Card> attackCards = new ArrayList<>();
+            ArrayList<Card> defendCards = new ArrayList<>();
+            ArrayList<Card> moveCards = new ArrayList<>();
+            for ( Card c : cards ) {
+                if (c.getType().equals(Card.CardActionType.ctAttack)) {
+                    attackCards.add(c);
+                } else if (c.getType().equals(Card.CardActionType.ctDefend)) {
+                    defendCards.add(c);
+                } else if (c.getType().equals(Card.CardActionType.ctMove)) {
+                    moveCards.add(c);
+                } else {
+                    throw new Exception("Unknown type of card");
+                }
+            }
+
             Instance i = new Instance(1.0, values.clone());
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 29443a69eb11737c58a91040682b870e45e39153
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
@@ -215,12 +235,11 @@ public class AgentFresco extends Agent {
                 }
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
                 if (selected.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())) {
-                    // TODO: pick best attack card
+                    return whichAttackToUse(attackCards, a, o, sb, selected);
                 } else if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
-                    // if we benefit from resting
-                    return new CardRest();
+                    return new CardRest(); // if the agent benefits from resting, the agent rests
                 } else { // Move closer to the opponent
-                    // TODO: pick best move card
+                    return minimizeDistanceCard(cards, sb, selected); // return the best move card
                 }
 
             } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
