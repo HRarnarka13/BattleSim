@@ -46,7 +46,7 @@ public class AgentChicken extends Agent {
         Card [] move = new Card[2];
 
         move[m_noOpponentAgent] = new CardRest();   // We assume the opponent just stays where he/she is,
-                                                    // and then take the move that brings us as far away as possible.
+        // and then take the move that brings us as far away as possible.
 
         Card bestCard = new CardRest();
         int  minDistance = calcDistanceBetweenAgents( stateBattle );
@@ -62,6 +62,7 @@ public class AgentChicken extends Agent {
                 minDistance = distance;
             }
         }
+        System.out.println("Chicken move = " + bestCard.toString());
 
         return bestCard;
     }

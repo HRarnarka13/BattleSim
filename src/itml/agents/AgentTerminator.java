@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class AgentTerminator extends Agent {
 
     private int m_noThisAgent;     // Index of our agent (0 or 1).
-    private int m_noOpponentAgent; // Index of opponent's agent.
+    private int m_noOpponentAgent; // Inex of opponent's agent.
 
     public AgentTerminator( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn );
@@ -52,15 +52,16 @@ public class AgentTerminator extends Agent {
         // First check to see if we are in attack range, if so attack.
         for ( Card card : cards ) {
             if ( (card.getType() == Card.CardActionType.ctAttack) &&
-                  card.inAttackRange( asThis.getCol(), asThis.getRow(),
-                                      asOpp.getCol(), asOpp.getRow() ) ) {
+                    card.inAttackRange( asThis.getCol(), asThis.getRow(),
+                            asOpp.getCol(), asOpp.getRow() ) ) {
+                System.out.println("Terminator move = " + card.getName());
                 return card;  // attack!
             }
         }
 
         // If we cannot attack, then try to move closer to the agent.
         Card [] move = new Card[2];
-        move[m_noOpponentAgent] = new CardRest();  
+        move[m_noOpponentAgent] = new CardRest();
 
         Card bestCard = new CardRest();
         int  bestDistance = calcDistanceBetweenAgents( stateBattle );
@@ -76,7 +77,7 @@ public class AgentTerminator extends Agent {
                 bestDistance = distance;
             }
         }
-
+        System.out.println("Terminator move = " + bestCard.toString());
         return bestCard;
     }
 

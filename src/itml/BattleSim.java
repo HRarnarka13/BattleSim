@@ -27,11 +27,11 @@ public class BattleSim {
      *  This is the main routine.
      *
      * @param  args  Command line arguments
-     *bla
+     *
      *      itml.BattleSim  [ <numSteps> <numTrainingGames> <numPlayingGames> </numPlayingGames><msConstuctor> <msPerMove> <msLearning> ]
      */
-	public static void main(String [] args)
-	{
+    public static void main(String [] args)
+    {
         System.out.println( "Welcome to BattleSim 2.1.3" );
 
         // Default arguments.
@@ -58,7 +58,7 @@ public class BattleSim {
                 }
             }
         }
-        
+
         // Set up the deck of cards.
         CardDeck deck = new CardDeck();
         deck.addCard( new CardRest() );
@@ -84,11 +84,11 @@ public class BattleSim {
         long  msStart, msDuration;
 
         msStart = System.currentTimeMillis();
-        Agent agentMy = new AgentRandom( deck.clone(), msConstruct, msPerMove, msLearning );   // The first agent is yours -- change to yours.
+        Agent agentMy = new AgentFresco( deck.clone(), msConstruct, msPerMove, msLearning );   // The first agent is yours -- change to yours.
         msDuration = System.currentTimeMillis() - msStart;
         System.out.println("Timing agent constructor = " + msDuration );
         if ( msDuration > msConstruct ) {
-           System.out.println("WARNING: exceeded time limit (" + msDuration + ">" + msConstruct + ")");
+            System.out.println("WARNING: exceeded time limit (" + msDuration + ">" + msConstruct + ")");
         }
 
         msStart = System.currentTimeMillis();
@@ -96,18 +96,18 @@ public class BattleSim {
         msDuration = System.currentTimeMillis() - msStart;
         System.out.println("Timing agent constructor = " + msDuration );
         if ( msDuration > msConstruct ) {
-           System.out.println("WARNING: exceeded time limit (" + msDuration + ">" + msConstruct + ")");
+            System.out.println("WARNING: exceeded time limit (" + msDuration + ">" + msConstruct + ")");
         }
 
         // Now generate the training data for you to observe to predict your opponent's actions;
         // for that we have the opponent play multiple matches against various sparring partners.
         Agent[] agentsSparringPartners = {
-                  new AgentChicken( deck.clone(), msConstruct, msPerMove, msLearning ),
-                  new AgentRandom( deck.clone(), msConstruct, msPerMove, msLearning ),
-                  new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning )
-               };
+                new AgentChicken( deck.clone(), msConstruct, msPerMove, msLearning ),
+                new AgentRandom( deck.clone(), msConstruct, msPerMove, msLearning ),
+                new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning )
+        };
         Instances instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
-                                                    agentOpp, agentsSparringPartners );
+                agentOpp, agentsSparringPartners );
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter( "history.arff"));
             writer.write( instances.toString() );
@@ -260,6 +260,6 @@ public class BattleSim {
 
         Instances instances = new Instances( "AgentBattleHistory", attributes, 0 );
         instances.setClassIndex(8);
-		return instances;
+        return instances;
     }
 }

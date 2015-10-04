@@ -23,7 +23,7 @@ import java.util.Random;
 public class AgentRandom extends Agent {
 
     private int m_noThisAgent;
-    
+
     static private Random m_random = new Random();  // A random number generator, for randomly picking actions.
 
     public AgentRandom( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
@@ -40,11 +40,13 @@ public class AgentRandom extends Agent {
 
     public Card act(StateBattle stateBattle) {
 
-        StateAgent stateAgent = stateBattle.getAgentState( m_noThisAgent );
-        
-        ArrayList<Card> cards = m_deck.getCards( stateAgent.getStaminaPoints() );
+        StateAgent stateAgent = stateBattle.getAgentState(m_noThisAgent);
 
-        return cards.get( m_random.nextInt( cards.size() ) );
+        ArrayList<Card> cards = m_deck.getCards(stateAgent.getStaminaPoints());
+        System.out.println();
+        Card randomCard = cards.get(m_random.nextInt(cards.size()));
+        System.out.println("Random move = " + randomCard.getName());
+        return randomCard;
     }
 
     public Classifier learn( Instances instances ) {
