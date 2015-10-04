@@ -175,7 +175,6 @@ public class AgentFresco extends Agent {
 
                 boolean o_isInAttackRange = selected.inAttackRange(a.getCol(), a.getRow(), o_col, o_row);
 
-
                 if (o_isInAttackRange) {
 
                 }
