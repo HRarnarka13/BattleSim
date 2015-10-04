@@ -85,7 +85,7 @@ public class Battle {
     * @param  msPerMove   An integer representing the maximum number of milliseconds a move can take.
     * @param  agents      Agents to match against each other.
     * @param  score       An array of double in which the score of each agent will be returned into
-    * @param  log         A GameLog, in whicch the progression of the game will be logged into.
+    * @param  log         A GameLog, in which the progression of the game will be logged into.
     *
     */
     public void run( boolean doDebug, int maxSteps, int msPerMove, Agent[] agents, double [] score, GameLog log ) {

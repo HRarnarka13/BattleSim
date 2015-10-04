@@ -2,6 +2,8 @@ package itml.cards;
 
 import itml.simulator.Coordinate;
 
+import java.util.Arrays;
+
 /**
  *
  *  This class provides the type Card, which represents a playing card for determining an action a player can make.
@@ -61,6 +63,20 @@ public class Card {
         m_hitPoints = hitPoints;
         m_defencePoints = defencePoints;
         m_range = range;
+    }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "m_name='" + m_name + '\'' +
+                ", m_type=" + m_type +
+                ", m_col=" + m_col +
+                ", m_row=" + m_row +
+                ", m_staminaPoints=" + m_staminaPoints +
+                ", m_hitPoints=" + m_hitPoints +
+                ", m_defencePoints=" + m_defencePoints +
+                ", m_range=" + Arrays.toString(m_range) +
+                '}';
     }
 
     /**
