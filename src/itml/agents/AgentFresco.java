@@ -195,11 +195,27 @@ public class AgentFresco extends Agent {
         try {
             ArrayList<Card> allCards = m_deck.getCards(); // all cards
             ArrayList<Card> cards = m_deck.getCards(a.getStaminaPoints());// cards that we have stamina to use
+
+            ArrayList<Card> attackCards = new ArrayList<>();
+            ArrayList<Card> defendCards = new ArrayList<>();
+            ArrayList<Card> moveCards = new ArrayList<>();
+            for ( Card c : cards ) {
+                if (c.getType().equals(Card.CardActionType.ctAttack)) {
+                    attackCards.add(c);
+                } else if (c.getType().equals(Card.CardActionType.ctDefend)) {
+                    defendCards.add(c);
+                } else if (c.getType().equals(Card.CardActionType.ctMove)) {
+                    moveCards.add(c);
+                } else {
+                    throw new Exception("Unknown type of card");
+                }
+            }
+
             Instance i = new Instance(1.0, values.clone());
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
-//            stateBattle.play();
+
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
