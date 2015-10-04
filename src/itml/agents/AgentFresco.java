@@ -12,6 +12,7 @@ import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import javax.swing.plaf.nimbus.State;
 import javax.swing.plaf.synth.Region;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class AgentFresco extends Agent {
      */
     private int distanceBetweenAgents(StateBattle sb) {
         StateAgent asFirst = sb.getAgentState( 0 );
-        StateAgent asSecond = sb.getAgentState( 1 );
+        StateAgent asSecond = sb.getAgentState(1);
 
         return Math.abs( asFirst.getCol() - asSecond.getCol() ) + Math.abs( asFirst.getRow() - asSecond.getRow() );
     }
@@ -83,15 +84,16 @@ public class AgentFresco extends Agent {
      * @param sb current state of battle
      * @return the best card
      */
-    private Card minimizeDistanceCard(List<Card> availableCards, StateBattle sb) {
+    private Card minimizeDistanceCard(List<Card> availableCards, StateBattle sb, Card predictedCard) {
         Card bestCard = new CardRest();
         int bestDistance = distanceBetweenAgents(sb);
         Card [] move = new Card[2];
-        move[m_noOpponentAgent] = new CardRest();
+        move[m_noOpponentAgent] = predictedCard;
         for (Card card : availableCards) {
+            StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
             move[m_noThisAgent] = card;
-            sb.play(move);
-            int  distance = distanceBetweenAgents(sb);
+            bs.play(move);
+            int  distance = distanceBetweenAgents(bs);
             if (distance < bestDistance) {
                 bestCard = card;
                 bestDistance = distance;
@@ -109,6 +111,51 @@ public class AgentFresco extends Agent {
     private boolean agentsOnSameSquare(StateAgent a, StateAgent o) {
         return a.getCol() == o.getCol() && a.getRow() == o.getRow();
     }
+
+    /**
+     * Calculate which attack card to use. First add all cards that will hit
+     * to a list then pick the highest damaging one.
+     * @param cards list of attack cards
+     * @param a our agent
+     * @param o opponent
+     * @param sb statbattle
+     * @param predictedCard the predict opponent card
+     * @return the best card to attack with
+     */
+    private Card whichAttackToUse(ArrayList<Card> cards, StateAgent a, StateAgent o, StateBattle sb, Card predictedCard){
+
+        Card restCard = new CardRest();
+        Card [] move = new Card[2];
+        move[m_noOpponentAgent] = predictedCard;
+        move[m_noThisAgent] = restCard;
+        ArrayList<Card> cardsThatHit = new ArrayList<Card>();
+        // play his card and a rest card
+        StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
+        bs.play(move);
+        for(Card c : cards){
+            // if attack will hit and we have enough stamina.
+            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow()) && a.getStaminaPoints() >= c.getStaminaPoints()){
+                cardsThatHit.add(c);
+            }
+            // will attack hit
+            // do we have stamina
+            // if many cards hit, which one to pick
+                // pick the one with the highest dmg and lowest stamina cost.
+        }
+        // if we dont find any card, return the rest card
+        if(cardsThatHit.isEmpty()){
+            return restCard;
+        }
+        Card bestCard = cardsThatHit.get(0);
+        // we already checked if we have enough stamina to use the card, so we just pick the highest damaging one
+        for(Card c : cardsThatHit){
+            if(c.getHitPoints() > bestCard.getHitPoints()){
+                bestCard = c;
+            }
+        }
+        return bestCard;
+    }
+
     // endregion
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
@@ -150,6 +197,7 @@ public class AgentFresco extends Agent {
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
+            stateBattle.play();
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
