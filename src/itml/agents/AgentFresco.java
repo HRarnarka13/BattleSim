@@ -104,7 +104,7 @@ public class AgentFresco extends Agent {
                 bestCard = card;
                 bestDistance = distance;
             }
-        }
+        }   
         return bestCard;
     }
 
@@ -134,13 +134,13 @@ public class AgentFresco extends Agent {
         Card [] move = new Card[2];
         move[m_noOpponentAgent] = predictedCard;
         move[m_noThisAgent] = restCard;
-        ArrayList<Card> cardsThatHit = new ArrayList<>();
-        // play his card and a rest card
-        StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
-        bs.play(move);
+        ArrayList<Card> cardsThatHit = new ArrayList<Card>();
+        int currentOHealthpoints = o.getHealthPoints();
         for(Card c : cards){
+            StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
+            bs.play(move);
             // if attack will hit add it to the list
-            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())){
+            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow()) && currentOHealthpoints > o.getHealthPoints() ){
                 cardsThatHit.add(c);
             }
         }
@@ -158,6 +158,25 @@ public class AgentFresco extends Agent {
         return bestCard;
     }
 
+    /**
+     *
+     * @param selected
+     * @param sb
+     * @return
+     */
+    private boolean opponentAttackWillHit(Card selected, StateBattle sb) {
+        Card ourMove = new CardRest();
+        Card [] move = new Card[2];
+        move[m_noThisAgent] = ourMove;
+        move[m_noOpponentAgent] = selected;
+        int aCurrHealthPoints = sb.getAgentState(m_noThisAgent).getHealthPoints();
+        sb.play(move);
+        if(aCurrHealthPoints < sb.getAgentState(m_noThisAgent).getHealthPoints()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     // endregion
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
@@ -215,21 +234,25 @@ public class AgentFresco extends Agent {
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
-
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
             Card.CardActionType cardType = selected.getType();
-            if(cardType.equals(Card.CardActionType.ctAttack)) { // Opponent about to attack
-                // TODO : do clever stuff
-                Card defend = new CardDefend();
-                for(Card c : cards){
-                    if (c.getType().equals(Card.CardActionType.ctDefend)) {
-                        // find the best defence card if there are many?
-                        System.out.println(c.getName());
-                        return c;
+            if(cardType.equals(Card.CardActionType.ctAttack)) {// Opponent about to attack
+                if(opponentAttackWillHit(selected, sb)) {
+                    // if we are stronger, attack
+                    if (a.getStaminaPoints() > o.getStaminaPoints() && a.getHealthPoints() > o.getHealthPoints()) {
+                        System.out.println("Attack because we have more HP");
+                        return whichAttackToUse(attackCards, a, o, sb, selected);
+                    } else {
+                        System.out.println("Dodge dip duck dive and dodge");
+                        return minimizeDistanceCard(cards, sb, selected); // DANCE, dodge the attack
                     }
+                } else {
+                    System.out.println("O missing his attack, attack him");
+                    whichAttackToUse(attackCards, a, o, sb, selected);
                 }
+
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
                 if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
                     return new CardRest(); // if the agent benefits from resting, the agent rests
@@ -251,11 +274,6 @@ public class AgentFresco extends Agent {
 
                 }
 
-            }
-
-            if(cards.contains(selected)) {
-                System.out.println(selected.getName());
-                return selected;
             }
         } catch (Exception e) {
             System.out.println("Error classifying new instance: " + e.toString());

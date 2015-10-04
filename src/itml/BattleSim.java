@@ -142,6 +142,8 @@ public class BattleSim {
             battle.run( false, numStepsInGame, msPerMove, agents, score, log );
             scoreMy += score[indexMyAgent];
             scoreOpp += score[indexOppAgent];
+            System.out.println( "My score = " + scoreMy + "  Opponent score = " + scoreOpp );
+
         }
         System.out.println( "My score = " + scoreMy + "  Opponent score = " + scoreOpp );
         System.out.println();
