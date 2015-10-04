@@ -247,8 +247,8 @@ public class BattleSim {
         }
 
         // Add the predicting attributes (all numeric)
-        attributes.addElement(new Attribute("a_x"));
         attributes.addElement(new Attribute("a_y"));
+        attributes.addElement(new Attribute("a_x"));
         attributes.addElement(new Attribute("a_health"));
         attributes.addElement(new Attribute("a_stamina"));
         attributes.addElement(new Attribute("o_x"));
