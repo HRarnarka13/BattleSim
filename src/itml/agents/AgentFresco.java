@@ -231,10 +231,10 @@ public class AgentFresco extends Agent {
                     }
                 }
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
-                if (selected.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())) {
-                    return whichAttackToUse(attackCards, a, o, sb, selected);
-                } else if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
+                if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
                     return new CardRest(); // if the agent benefits from resting, the agent rests
+                } else if (selected.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())) {
+                    return whichAttackToUse(attackCards, a, o, sb, selected);
                 } else { // Move closer to the opponent
                     return minimizeDistanceCard(cards, sb, selected); // return the best move card
                 }
