@@ -128,7 +128,7 @@ public class BattleSim {
         }
 
         // Run match games (alternate agent order), and keep track of the score.
-        System.out.println( "Match games: " + numPlayingGames );
+        System.out.println( "Match games: " + numPlayingGames + "==================================");
         Agent[] agents = new Agent[2];
         double [] score = new double[2];
         double scoreMy = 0.0;
@@ -139,7 +139,7 @@ public class BattleSim {
             int  indexOppAgent = (indexMyAgent == 0) ? 1 : 0;
             agents[indexMyAgent] = agentMy;
             agents[indexOppAgent] = agentOpp;
-            battle.run( false, numStepsInGame, msPerMove, agents, score, log );
+            battle.run( true, numStepsInGame, msPerMove, agents, score, log );
             scoreMy += score[indexMyAgent];
             scoreOpp += score[indexOppAgent];
             System.out.println( "My score = " + scoreMy + "  Opponent score = " + scoreOpp );
