@@ -215,10 +215,6 @@ public class AgentFresco extends Agent {
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
-<<<<<<< HEAD
-=======
-
->>>>>>> 29443a69eb11737c58a91040682b870e45e39153
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
