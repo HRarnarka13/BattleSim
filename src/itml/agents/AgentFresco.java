@@ -13,6 +13,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: deong
@@ -23,6 +24,41 @@ public class AgentFresco extends Agent {
     private int m_noOpponentAgent; // Inex of opponent's agent.
     private Classifier classifier_;
     private Instances dataset;
+
+    /**
+     * Calculates the distance between two agents
+     * @param sb current state of battle
+     * @return the distance between agents
+     */
+    private int distanceBetweenAgents(StateBattle sb) {
+        StateAgent asFirst = sb.getAgentState( 0 );
+        StateAgent asSecond = sb.getAgentState( 1 );
+
+        return Math.abs( asFirst.getCol() - asSecond.getCol() ) + Math.abs( asFirst.getRow() - asSecond.getRow() );
+    }
+
+    /**
+     * Finds the card that brings us closest to the opponent
+     * @param availableCards list of currently available cards
+     * @param sb current state of battle
+     * @return the best card
+     */
+    private Card minimizeDistanceCard(List<Card> availableCards, StateBattle sb) {
+        Card bestCard = new CardRest();
+        int bestDistance = distanceBetweenAgents(sb);
+        Card [] move = new Card[2];
+        move[m_noOpponentAgent] = new CardRest();
+        for (Card card : availableCards) {
+            move[m_noThisAgent] = card;
+            sb.play(move);
+            int  distance = distanceBetweenAgents(sb);
+            if (distance < bestDistance) {
+                bestCard = card;
+                bestDistance = distance;
+            }
+        }
+        return bestCard;
+    }
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
@@ -44,6 +80,7 @@ public class AgentFresco extends Agent {
 
     @Override
     public Card act(StateBattle stateBattle) {
+        StateBattle bs = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
         double[] values = new double[8];
         StateAgent a = stateBattle.getAgentState(0);
         StateAgent o = stateBattle.getAgentState(1);
