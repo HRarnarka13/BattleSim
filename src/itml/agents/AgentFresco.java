@@ -104,7 +104,7 @@ public class AgentFresco extends Agent {
                 bestCard = card;
                 bestDistance = distance;
             }
-        }
+        }   
         return bestCard;
     }
 
