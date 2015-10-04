@@ -63,6 +63,15 @@ public class AgentFresco extends Agent {
         return bestCard;
     }
 
+    /**
+     * Returns true if both agents are on the same field.
+     * @param a our agent
+     * @param o opponent agent
+     * @return True if on same field.
+     */
+    private boolean agentsOnSameSquare(StateAgent a, StateAgent o) {
+        return a.getCol() == o.getCol() && a.getRow() == o.getRow();
+    }
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
         classifier_ = new J48();
