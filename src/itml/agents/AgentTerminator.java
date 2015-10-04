@@ -77,7 +77,7 @@ public class AgentTerminator extends Agent {
                 bestDistance = distance;
             }
         }
-        System.out.println("Terminator move = " + bestCard.toString());
+        System.out.println("Terminator move = " + bestCard.getName());
         return bestCard;
     }
 

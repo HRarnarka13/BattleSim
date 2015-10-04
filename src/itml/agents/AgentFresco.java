@@ -135,12 +135,12 @@ public class AgentFresco extends Agent {
         move[m_noOpponentAgent] = predictedCard;
         move[m_noThisAgent] = restCard;
         ArrayList<Card> cardsThatHit = new ArrayList<Card>();
-        // play his card and a rest card
-        StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
-        bs.play(move);
+        int currentOHealthpoints = o.getHealthPoints();
         for(Card c : cards){
+            StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
+            bs.play(move);
             // if attack will hit add it to the list
-            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())){
+            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow()) && currentOHealthpoints > o.getHealthPoints() ){
                 cardsThatHit.add(c);
             }
         }
@@ -199,7 +199,6 @@ public class AgentFresco extends Agent {
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
-//            stateBattle.play();
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
