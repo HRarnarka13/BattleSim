@@ -165,13 +165,14 @@ public class AgentFresco extends Agent {
      * @return
      */
     private boolean opponentAttackWillHit(Card selected, StateBattle sb) {
+        StateBattle bs = (StateBattle) sb.clone();
         Card ourMove = new CardRest();
         Card [] move = new Card[2];
         move[m_noThisAgent] = ourMove;
         move[m_noOpponentAgent] = selected;
-        int aCurrHealthPoints = sb.getAgentState(m_noThisAgent).getHealthPoints();
-        sb.play(move);
-        if(aCurrHealthPoints < sb.getAgentState(m_noThisAgent).getHealthPoints()) {
+        int aCurrHealthPoints = bs.getAgentState(m_noThisAgent).getHealthPoints();
+        bs.play(move);
+        if(aCurrHealthPoints < bs.getAgentState(m_noThisAgent).getHealthPoints()) {
             return true;
         } else {
             return false;
@@ -249,7 +250,7 @@ public class AgentFresco extends Agent {
                         return minimizeDistanceCard(cards, sb, selected); // DANCE, dodge the attack
                     }
                 } else {
-                    System.out.println("O missing his attack, attack him");
+                    System.out.println("O missing his attack, attack him \n" + "Our health " + a.getHealthPoints() + "\nopponent hitpoint " + o.getHealthPoints());
                     whichAttackToUse(attackCards, a, o, sb, selected);
                 }
 
