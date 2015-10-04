@@ -88,15 +88,19 @@ public class AgentFresco extends Agent {
      */
     private Card minimizeDistanceCard(List<Card> availableCards, StateBattle sb, Card predictedCard) {
         Card bestCard = new CardRest();
+        StateAgent a = sb.getAgentState(m_noThisAgent);
         int bestDistance = distanceBetweenAgents(sb);
         Card [] move = new Card[2];
         move[m_noOpponentAgent] = predictedCard;
+        int currentHealthPoints = a.getHealthPoints();
         for (Card card : availableCards) {
             StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
             move[m_noThisAgent] = card;
             bs.play(move);
             int  distance = distanceBetweenAgents(bs);
-            if (distance < bestDistance) {
+            // if this move brings us closest to the opponent and does not reduce our healthpoints
+            // we pick this move as the best available move.
+            if (distance < bestDistance && currentHealthPoints < a.getHealthPoints()) {
                 bestCard = card;
                 bestDistance = distance;
             }
@@ -135,14 +139,10 @@ public class AgentFresco extends Agent {
         StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
         bs.play(move);
         for(Card c : cards){
-            // if attack will hit and we have enough stamina.
-            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow()) && a.getStaminaPoints() >= c.getStaminaPoints()){
+            // if attack will hit add it to the list
+            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())){
                 cardsThatHit.add(c);
             }
-            // will attack hit
-            // do we have stamina
-            // if many cards hit, which one to pick
-                // pick the one with the highest dmg and lowest stamina cost.
         }
         // if we dont find any card, return the rest card
         if(cardsThatHit.isEmpty()){
@@ -199,7 +199,7 @@ public class AgentFresco extends Agent {
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
-            stateBattle.play();
+//            stateBattle.play();
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
