@@ -242,11 +242,14 @@ public class AgentFresco extends Agent {
                 if(opponentAttackWillHit(selected, sb)) {
                     // if we are stronger, attack
                     if (a.getStaminaPoints() > o.getStaminaPoints() && a.getHealthPoints() > o.getHealthPoints()) {
+                        System.out.println("Attack because we have more HP");
                         return whichAttackToUse(attackCards, a, o, sb, selected);
                     } else {
+                        System.out.println("Dodge dip duck dive and dodge");
                         return minimizeDistanceCard(cards, sb, selected); // DANCE, dodge the attack
                     }
                 } else {
+                    System.out.println("O missing his attack, attack him");
                     whichAttackToUse(attackCards, a, o, sb, selected);
                 }
 
@@ -271,11 +274,6 @@ public class AgentFresco extends Agent {
 
                 }
 
-            }
-
-            if(cards.contains(selected)) {
-                System.out.println(selected.getName());
-                return selected;
             }
         } catch (Exception e) {
             System.out.println("Error classifying new instance: " + e.toString());
