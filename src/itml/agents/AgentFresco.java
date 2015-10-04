@@ -25,12 +25,14 @@ public class AgentFresco extends Agent {
     private int m_noOpponentAgent; // Inex of opponent's agent.
     private Classifier classifier_;
     private Instances dataset;
-    private final int GRID_SIZE = 4;
 
+    private final int GRID_SIZE = 4;
+    private final int MAXIMUM_STAMINA = 10;
     private enum Direction {RIGHT, LEFT, UP, DOWN}
 
     // region Helpers
-    
+
+
     /**
      * This function returns how many tiles a player can move in a given direction without
      * going out of the grid.
@@ -144,7 +146,9 @@ public class AgentFresco extends Agent {
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
-            if(selected.getType().equals(Card.CardActionType.ctAttack)){
+            Card.CardActionType cardType = selected.getType();
+            if(cardType.equals(Card.CardActionType.ctAttack)) { // Opponent about to attack
+                // TODO : do clever stuff
                 Card defend = new CardDefend();
                 for(Card c : cards){
                     if (c.getType().equals(Card.CardActionType.ctDefend)) {
@@ -153,6 +157,29 @@ public class AgentFresco extends Agent {
                         return c;
                     }
                 }
+            } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
+                if (selected.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())) {
+                    // TODO: pick best attack card
+                } else if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
+                    // if we benefit from resting
+                    return new CardRest();
+                } else { // Move closer to the opponent
+                    // TODO: pick best move card
+                }
+
+            } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
+                // TODO : do clever stuff
+                // Get opponent position after his move
+                int o_col = o.getCol() + selected.getCol();
+                int o_row = o.getRow() + selected.getRow();
+
+                boolean o_isInAttackRange = selected.inAttackRange(a.getCol(), a.getRow(), o_col, o_row);
+
+
+                if (o_isInAttackRange) {
+
+                }
+
             }
 
             if(cards.contains(selected)) {
