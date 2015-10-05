@@ -25,7 +25,12 @@ public class AgentFresco extends Agent {
     private int m_noOpponentAgent; // Inex of opponent's agent.
     private Classifier classifier_;
     private Instances dataset;
+    private Card lastPredict;
+    private Card ourLastMove;
 
+    public int totalCorrect = 0;
+    public int totalWrong = 0;
+    public int totalSteps = 0;
 
     private final int GRID_SIZE = 4;
     private final int MAXIMUM_STAMINA = 10;
@@ -202,8 +207,8 @@ public class AgentFresco extends Agent {
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
-        classifier_ = new J48();
-
+          classifier_ = new J48();
+        classifier_.;
 //          classifier_ = new NaiveBayes();
     }
 
@@ -228,10 +233,45 @@ public class AgentFresco extends Agent {
 
     @Override
     public Card act(StateBattle stateBattle) {
+        System.out.println("Total Correct : " + totalCorrect + " Total : " + totalSteps);
+        if (ourLastMove != null)
+            System.out.println("ourLastMove.getName() = " + ourLastMove.getName());
+
         StateBattle sb = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
+        System.out.println();
         double[] values = new double[8];
         StateAgent a = stateBattle.getAgentState(m_noThisAgent);
         StateAgent o = stateBattle.getAgentState(m_noOpponentAgent);
+
+        boolean foundOpponentCard = false;
+        Card opponentCard = null;
+        for (Card c : sb.getLastMoves() ) {
+            if (c != null && ourLastMove.getName() != c.getName()) {
+                foundOpponentCard = true;
+                opponentCard = c;
+                System.out.println("Enemy last move " + c.getName());
+            }
+        }
+        if (ourLastMove !=null && foundOpponentCard == false) {
+            opponentCard = ourLastMove;
+            System.out.println("Enemy last move = " + ourLastMove.getName());
+        }
+
+        if (opponentCard != null && lastPredict != null ) {
+            if (opponentCard.getName().equals(lastPredict.getName())) {
+                System.out.println("we prediceted opponent correctly");
+                totalCorrect++;
+                totalSteps++;
+            } else {
+                System.out.println("****************");
+                System.out.println("we failed, opponentCard : " + opponentCard.getName() + " lastPredict : " + lastPredict.getName());
+                System.out.println("****************");
+                totalWrong++;
+                totalSteps++;
+            }
+        }
+
+
         values[0] = a.getCol();
         values[1] = a.getRow();
         values[2] = a.getHealthPoints();
@@ -259,14 +299,16 @@ public class AgentFresco extends Agent {
                     throw new Exception("Unknown type of card");
                 }
             }
+            Card returnCard;
             Card selected = predictCard(values, allCards);
+            lastPredict = selected;
             String ourGuess = selected.getName();
             System.out.println("Our  guess = " + ourGuess);
-            System.out.println(sb.toString());
-
             // if the opponent does not have any stamina we attack him no matter what
             if(o.getStaminaPoints() < 1){
-                return whichAttackToUse(attackCards, a, o, sb, new CardRest());
+                returnCard = whichAttackToUse(attackCards, a, o, sb, new CardRest());
+                ourLastMove = returnCard;
+                return returnCard;
             }
 
             // What to do if opponent attacks
@@ -276,29 +318,43 @@ public class AgentFresco extends Agent {
                     // if we are stronger, attack
                     if (a.getStaminaPoints() > o.getStaminaPoints() && a.getHealthPoints() > o.getHealthPoints()) {
 //                        System.out.println("Attack because we have more HP");
-                        return whichAttackToUse(attackCards, a, o, sb, selected);
+                        returnCard = whichAttackToUse(attackCards, a, o, sb, selected);
+                        ourLastMove = returnCard;
+                        return returnCard;
                     } else {
 //                        System.out.println("Dodge dip duck dive and dodge");
 //                        System.out.println(minimizeDistanceCard(moveCards, sb, selected).getName());
-                        return minimizeDistanceCard(moveCards, sb, selected); // DANCE, dodge the attack
+                        returnCard = minimizeDistanceCard(moveCards, sb, selected); // DANCE, dodge the attack
+                        ourLastMove =  returnCard;
+                        return returnCard;
                     }
                 } else {
 //                    System.out.println("Opponent missing his attack, attack him ");
 //                    System.out.println(whichAttackToUse(attackCards, a, o, sb, selected).getName());
                     if(whichAttackToUse(attackCards, a, o, sb, selected).getName().equals("cRest")){
 //                        System.out.println("if attack to use != rest");
-                        return minimizeDistanceCard(moveCards, sb, selected);
+                        returnCard = minimizeDistanceCard(moveCards, sb, selected);
+                        ourLastMove = returnCard;
+                        return returnCard;
                     }
-                    return whichAttackToUse(attackCards, a, o, sb, selected);
+                    returnCard = whichAttackToUse(attackCards, a, o, sb, selected);
+                    ourLastMove = returnCard;
+                    return returnCard;
                 }
                 // if opponent is defending
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
                 if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
-                    return new CardRest(); // if the agent benefits from resting, the agent rests
+                    returnCard = new CardRest(); // if the agent benefits from resting, the agent rests
+                    ourLastMove = returnCard;
+                    return returnCard;
                 } else if (selected.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow())) {
-                    return whichAttackToUse(attackCards, a, o, sb, selected);
+                    returnCard = whichAttackToUse(attackCards, a, o, sb, selected);
+                    ourLastMove = returnCard;
+                    return returnCard;
                 } else { // Move closer to the opponent
-                    return minimizeDistanceCard(cards, sb, selected); // return the best move card
+                    returnCard = minimizeDistanceCard(cards, sb, selected); // return the best move card
+                    ourLastMove = returnCard;
+                    return returnCard;
                 }
             //if opponent is moving
             } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
@@ -306,19 +362,25 @@ public class AgentFresco extends Agent {
 //                    System.out.println("tessi if setning gaeti verid vitlaus");
                     if(whichAttackToUse(attackCards, a, o, sb, selected).getName().equals("cRest")){
 //                        System.out.println("er tad ad skila okkur resT???" + minimizeDistanceCard(moveCards, sb, selected).getName());
-                        return minimizeDistanceCard(moveCards, sb, selected);
+                        returnCard = minimizeDistanceCard(moveCards, sb, selected);
+                        ourLastMove = returnCard;
+                        return returnCard;
                     } else{
-                        return whichAttackToUse(attackCards, a, o, sb, selected);
+                        returnCard = whichAttackToUse(attackCards, a, o, sb, selected);
+                        ourLastMove = returnCard;
+                        return returnCard;
                     }
 
                 } else {
                     //
                     if(whichAttackToUse(attackCards, a, o, sb, selected).getName().equals("cRest")){
-                        Card testCard = minimizeDistanceCard(moveCards, sb, selected);
-                        return minimizeDistanceCard(moveCards, sb, selected);
+                        returnCard = minimizeDistanceCard(moveCards, sb, selected);
+                        ourLastMove = returnCard;
+                        return returnCard;
                     }
-                    return whichAttackToUse(attackCards, a, o, sb, selected);
-
+                    returnCard = whichAttackToUse(attackCards, a, o, sb, selected);
+                    ourLastMove = returnCard;
+                    return returnCard;
                 }
             }
         } catch (Exception e) {

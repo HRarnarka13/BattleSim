@@ -112,7 +112,7 @@ public class Battle {
         for ( int step=0; step<maxSteps && !isGameOver; ++step ) {
 
             if ( doDebug ) {
-                   //System.out.println( bs.toString() );
+                   System.out.println( bs.toString() );
             }
             for ( int a=0; a < agents.length; a++ ) {
                 if ( bs.getAgentState( a ).getHealthPoints() > 0 ) {
