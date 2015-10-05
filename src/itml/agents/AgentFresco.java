@@ -1,19 +1,15 @@
 package itml.agents;
 
 import itml.cards.Card;
-import itml.cards.CardDefend;
 import itml.cards.CardRest;
 import itml.simulator.CardDeck;
 import itml.simulator.StateAgent;
 import itml.simulator.StateBattle;
 import weka.classifiers.Classifier;
-import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import javax.swing.plaf.nimbus.State;
-import javax.swing.plaf.synth.Region;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +82,7 @@ public class AgentFresco extends Agent {
      * @param sb current state of battle
      * @return the best card
      */
-    private Card minimizeDistanceCard(List<Card> availableCards, StateBattle sb, Card predictedCard) {
+    private Card minimizeDistanceCard(ArrayList<Card> availableCards, StateBattle sb, Card predictedCard) {
         Card bestCard = new CardRest();
         StateAgent a = sb.getAgentState(m_noThisAgent);
         int bestDistance = distanceBetweenAgents(sb);
@@ -100,7 +96,8 @@ public class AgentFresco extends Agent {
             int  distance = distanceBetweenAgents(bs);
             // if this move brings us closest to the opponent and does not reduce our healthpoints
             // we pick this move as the best available move.
-            if (distance < bestDistance && currentHealthPoints < a.getHealthPoints()) {
+            int healthPointAfterMove = bs.getAgentState(m_noThisAgent).getHealthPoints();
+            if (distance - 1  <= bestDistance  && currentHealthPoints == healthPointAfterMove) {
                 bestCard = card;
                 bestDistance = distance;
             }
@@ -133,17 +130,21 @@ public class AgentFresco extends Agent {
         Card restCard = new CardRest();
         Card [] move = new Card[2];
         move[m_noOpponentAgent] = predictedCard;
-        move[m_noThisAgent] = restCard;
         ArrayList<Card> cardsThatHit = new ArrayList<Card>();
         int currentOHealthpoints = o.getHealthPoints();
         for(Card c : cards){
+//            System.out.println("Attack card " + c.getName() + " Stamina required " + c.getStaminaPoints() + " Our stamina " +  a.getStaminaPoints());
             StateBattle bs = (StateBattle) sb.clone();   // close the state, as play( ) modifies it.
+            StateAgent opponentAfterMove = bs.getAgentState(m_noOpponentAgent);
+            move[m_noThisAgent] = c;
             bs.play(move);
             // if attack will hit add it to the list
-            if(c.inAttackRange(a.getCol(), a.getRow(), o.getCol(), o.getRow()) && currentOHealthpoints > o.getHealthPoints() ){
+            if(c.inAttackRange(a.getCol(), a.getRow(), opponentAfterMove.getCol(), opponentAfterMove.getRow())
+                    && currentOHealthpoints > bs.getAgentState(m_noOpponentAgent).getHealthPoints() ){
                 cardsThatHit.add(c);
             }
         }
+        System.out.println("how many cards that hit " + cardsThatHit.size());
         // if we dont find any card, return the rest card
         if(cardsThatHit.isEmpty()){
             return restCard;
@@ -165,13 +166,14 @@ public class AgentFresco extends Agent {
      * @return
      */
     private boolean opponentAttackWillHit(Card selected, StateBattle sb) {
+        StateBattle bs = (StateBattle) sb.clone();
         Card ourMove = new CardRest();
         Card [] move = new Card[2];
         move[m_noThisAgent] = ourMove;
         move[m_noOpponentAgent] = selected;
-        int aCurrHealthPoints = sb.getAgentState(m_noThisAgent).getHealthPoints();
-        sb.play(move);
-        if(aCurrHealthPoints < sb.getAgentState(m_noThisAgent).getHealthPoints()) {
+        int aCurrHealthPoints = bs.getAgentState(m_noThisAgent).getHealthPoints();
+        bs.play(move);
+        if(aCurrHealthPoints > bs.getAgentState(m_noThisAgent).getHealthPoints()) {
             return true;
         } else {
             return false;
@@ -199,6 +201,8 @@ public class AgentFresco extends Agent {
 
     @Override
     public Card act(StateBattle stateBattle) {
+
+        System.out.println();
         StateBattle sb = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
         double[] values = new double[8];
         StateAgent a = stateBattle.getAgentState(0);
@@ -211,6 +215,8 @@ public class AgentFresco extends Agent {
         values[5] = o.getRow();
         values[6] = o.getHealthPoints();
         values[7] = o.getStaminaPoints();
+        System.out.println("Current score after last round :  \n" + "Our health " + a.getHealthPoints() + "\nopponent hitpoint " + o.getHealthPoints());
+
         try {
             ArrayList<Card> allCards = m_deck.getCards(); // all cards
             ArrayList<Card> cards = m_deck.getCards(a.getStaminaPoints());// cards that we have stamina to use
@@ -234,6 +240,10 @@ public class AgentFresco extends Agent {
             System.out.println("A col row : " + a.getCol() + " " + a.getRow());
             System.out.println("O col row : " + o.getCol() + " " + o.getRow());
 
+            // if the opponent does not have any stamina we attack him no matter what
+            if(o.getStaminaPoints() < 1){
+                return whichAttackToUse(attackCards, a, o, sb, new CardRest());
+            }
             Instance i = new Instance(1.0, values.clone());
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
@@ -250,11 +260,13 @@ public class AgentFresco extends Agent {
                         return whichAttackToUse(attackCards, a, o, sb, selected);
                     } else {
                         System.out.println("Dodge dip duck dive and dodge");
-                        return minimizeDistanceCard(cards, sb, selected); // DANCE, dodge the attack
+                        System.out.println(minimizeDistanceCard(moveCards, sb, selected).getName());
+                        return minimizeDistanceCard(moveCards, sb, selected); // DANCE, dodge the attack
                     }
                 } else {
-                    System.out.println("O missing his attack, attack him");
-                    return  whichAttackToUse(attackCards, a, o, sb, selected);
+                    System.out.println("Opponent missing his attack, attack him ");
+                    System.out.println(whichAttackToUse(attackCards, a, o, sb, selected));
+                    return whichAttackToUse(attackCards, a, o, sb, selected);
                 }
 
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
@@ -267,16 +279,13 @@ public class AgentFresco extends Agent {
                 }
 
             } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
-                // TODO : do clever stuff
-                // Get opponent position after his move
-                int o_col = o.getCol() + selected.getCol();
-                int o_row = o.getRow() + selected.getRow();
-
-                boolean o_isInAttackRange = selected.inAttackRange(a.getCol(), a.getRow(), o_col, o_row);
-
-                if (o_isInAttackRange) {
+                if(selected.getName().equals("cRest")){
+                    return minimizeDistanceCard(moveCards, sb, selected);
+                } else {
+                    return whichAttackToUse(attackCards, a, o, sb, selected);
 
                 }
+                // Get opponent position after his move
 
             }
         } catch (Exception e) {
