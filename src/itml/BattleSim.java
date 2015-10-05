@@ -36,7 +36,7 @@ public class BattleSim {
 
         // Default arguments.
         int numStepsInGame   = 30;     // Maximum step length of a game.
-        int numTrainingGames = 10;     // Number of games to play in the training phase.
+        int numTrainingGames = 100;    // Number of games to play in the training phase.
         int numPlayingGames  = 100;    // Number of games to play in the evaluation phase.
         int msConstruct      = 5000;   // Maximum time to use in Agent constructor (in ms.)
         int msPerMove        = 50;     // Maximum time to use per act, startGame, endGame call.

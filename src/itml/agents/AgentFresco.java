@@ -6,6 +6,7 @@ import itml.simulator.CardDeck;
 import itml.simulator.StateAgent;
 import itml.simulator.StateBattle;
 import weka.classifiers.Classifier;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -183,8 +184,8 @@ public class AgentFresco extends Agent {
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
-        classifier_ = new J48();
-//        classifier_ = new NaiveBayes();
+//        classifier_ = new J48();
+          classifier_ = new NaiveBayes();
     }
 
     @Override
@@ -243,6 +244,7 @@ public class AgentFresco extends Agent {
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
             Card selected = allCards.get(out);
+            String ourGuess = selected.getName();
             System.out.println("Our  guess = " + selected.getName());
 
             // What to do if the opponent is likely to attack
@@ -263,7 +265,7 @@ public class AgentFresco extends Agent {
                     System.out.println(whichAttackToUse(attackCards, a, o, sb, selected));
                     return whichAttackToUse(attackCards, a, o, sb, selected);
                 }
-
+            // if opponent is defending
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
                 if (a.getStaminaPoints() + new CardRest().getStaminaPoints() <= MAXIMUM_STAMINA ) {
                     return new CardRest(); // if the agent benefits from resting, the agent rests
@@ -272,16 +274,20 @@ public class AgentFresco extends Agent {
                 } else { // Move closer to the opponent
                     return minimizeDistanceCard(cards, sb, selected); // return the best move card
                 }
-
+            //if opponent is moving
             } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
                 if(selected.getName().equals("cRest")){
                     return minimizeDistanceCard(moveCards, sb, selected);
                 } else {
+                    //
+                    if(whichAttackToUse(attackCards, a, o, sb, selected).getName().equals("cRest")){
+                        Card testCard = minimizeDistanceCard(moveCards, sb, selected);
+                        System.out.println("TEST !!" + testCard.getName());
+                        return minimizeDistanceCard(moveCards, sb, selected);
+                    }
                     return whichAttackToUse(attackCards, a, o, sb, selected);
 
                 }
-                // Get opponent position after his move
-
             }
         } catch (Exception e) {
             System.out.println("Error classifying new instance: " + e.toString());

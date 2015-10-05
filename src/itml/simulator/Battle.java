@@ -88,7 +88,7 @@ public class Battle {
     * @param  log         A GameLog, in which the progression of the game will be logged into.
     *
     */
-    public void run( boolean doDebug, int maxSteps, int msPerMove, Agent[] agents, double [] score, GameLog log ) {
+    public void run( boolean doDebug, int   maxSteps, int msPerMove, Agent[] agents, double [] score, GameLog log ) {
 
 
         StateBattle bs = new StateBattle( m_numColumns, m_numRows, maxSteps, m_stateAgents);
