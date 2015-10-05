@@ -230,6 +230,10 @@ public class AgentFresco extends Agent {
                 }
             }
 
+            System.out.println();
+            System.out.println("A col row : " + a.getCol() + " " + a.getRow());
+            System.out.println("O col row : " + o.getCol() + " " + o.getRow());
+
             Instance i = new Instance(1.0, values.clone());
             i.setDataset(dataset);
             int out = (int)classifier_.classifyInstance(i);
@@ -250,7 +254,7 @@ public class AgentFresco extends Agent {
                     }
                 } else {
                     System.out.println("O missing his attack, attack him");
-                    whichAttackToUse(attackCards, a, o, sb, selected);
+                    return  whichAttackToUse(attackCards, a, o, sb, selected);
                 }
 
             } else if (cardType.equals(Card.CardActionType.ctDefend)) { // Opponent about to defend
