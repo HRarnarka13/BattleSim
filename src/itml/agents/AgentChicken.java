@@ -62,7 +62,7 @@ public class AgentChicken extends Agent {
                 minDistance = distance;
             }
         }
-        System.out.println("Chicken move = " + bestCard.getName());
+//        System.out.println("Chicken move = " + bestCard.getName());
         return bestCard;
     }
 

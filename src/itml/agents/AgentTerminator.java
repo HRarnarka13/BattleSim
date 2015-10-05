@@ -43,6 +43,7 @@ public class AgentTerminator extends Agent {
     }
 
     public Card act(StateBattle stateBattle) {
+//        AgentFresco agentFresco = new AgentFresco(m_deck, m_msConstruct, m_msPerMove, m_msLearn);
 
         StateAgent asThis = stateBattle.getAgentState( m_noThisAgent );
         StateAgent asOpp  = stateBattle.getAgentState( m_noOpponentAgent );
@@ -54,7 +55,7 @@ public class AgentTerminator extends Agent {
             if ( (card.getType() == Card.CardActionType.ctAttack) &&
                     card.inAttackRange( asThis.getCol(), asThis.getRow(),
                             asOpp.getCol(), asOpp.getRow() ) ) {
-                System.out.println("Terminator move = " + card.getName());
+//                System.out.println("Terminator move = " + card.getName());
                 return card;  // attack!
             }
         }
@@ -77,7 +78,7 @@ public class AgentTerminator extends Agent {
                 bestDistance = distance;
             }
         }
-        System.out.println("Terminator move = " + bestCard.getName());
+//        System.out.println("Terminator move = " + bestCard.getName());
         return bestCard;
     }
 

@@ -45,7 +45,7 @@ public class AgentRandom extends Agent {
         ArrayList<Card> cards = m_deck.getCards(stateAgent.getStaminaPoints());
         System.out.println();
         Card randomCard = cards.get(m_random.nextInt(cards.size()));
-        System.out.println("Random move = " + randomCard.getName());
+//        System.out.println("Random move = " + randomCard.getName());
         return randomCard;
     }
 

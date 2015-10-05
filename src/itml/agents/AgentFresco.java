@@ -3,6 +3,7 @@ package itml.agents;
 import itml.cards.Card;
 import itml.cards.CardRest;
 import itml.simulator.CardDeck;
+import itml.simulator.GameLog;
 import itml.simulator.StateAgent;
 import itml.simulator.StateBattle;
 import weka.classifiers.Classifier;
@@ -11,6 +12,7 @@ import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class AgentFresco extends Agent {
     private int m_noOpponentAgent; // Inex of opponent's agent.
     private Classifier classifier_;
     private Instances dataset;
+
 
     private final int GRID_SIZE = 4;
     private final int MAXIMUM_STAMINA = 10;
@@ -101,7 +104,7 @@ public class AgentFresco extends Agent {
 //                bestDistance = distance;
             }
         }
-        System.out.println("Number of safe zone cards" + safeZoneCards.size());
+//        System.out.println("Number of safe zone cards" + safeZoneCards.size());
         Card bestCard = safeZoneCards.get(0);
         int bestDistance = distanceBetweenAgents(sb);
         for(Card c : safeZoneCards){
@@ -159,7 +162,7 @@ public class AgentFresco extends Agent {
                 cardsThatHit.add(c);
             }
         }
-        System.out.println("how many cards that hit " + cardsThatHit.size());
+//        System.out.println("how many cards that hit " + cardsThatHit.size());
         // if we dont find any card, return the rest card
         if(cardsThatHit.isEmpty()){
             return restCard;
@@ -171,7 +174,7 @@ public class AgentFresco extends Agent {
                 bestCard = c;
             }
         }
-        System.out.println("Best attack card  = " + bestCard.getName());
+//        System.out.println("Best attack card  = " + bestCard.getName());
         return bestCard;
     }
 
@@ -215,15 +218,20 @@ public class AgentFresco extends Agent {
     public void endGame(StateBattle stateBattle, double[] results) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+    public Card predictCard(double[] values, ArrayList<Card> allCards) throws Exception {
+        Instance i = new Instance(1.0, values.clone());
+        i.setDataset(dataset);
+        int out = (int)classifier_.classifyInstance(i);
+        Card selected = allCards.get(out);
+        return selected;
+    }
 
     @Override
     public Card act(StateBattle stateBattle) {
-
-        System.out.println();
         StateBattle sb = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
         double[] values = new double[8];
-        StateAgent a = stateBattle.getAgentState(0);
-        StateAgent o = stateBattle.getAgentState(1);
+        StateAgent a = stateBattle.getAgentState(m_noThisAgent);
+        StateAgent o = stateBattle.getAgentState(m_noOpponentAgent);
         values[0] = a.getCol();
         values[1] = a.getRow();
         values[2] = a.getHealthPoints();
@@ -232,8 +240,7 @@ public class AgentFresco extends Agent {
         values[5] = o.getRow();
         values[6] = o.getHealthPoints();
         values[7] = o.getStaminaPoints();
-//        System.out.println("Current score after last round :  \n" + "Our health " + a.getHealthPoints() + "\nopponent hitpoint " + o.getHealthPoints());
-
+        System.out.println("Index our index : " + m_noThisAgent + " Index their index : " + m_noOpponentAgent);
         try {
             ArrayList<Card> allCards = m_deck.getCards(); // all cards
             ArrayList<Card> cards = m_deck.getCards(a.getStaminaPoints());// cards that we have stamina to use
@@ -252,17 +259,15 @@ public class AgentFresco extends Agent {
                     throw new Exception("Unknown type of card");
                 }
             }
+            Card selected = predictCard(values, allCards);
+            String ourGuess = selected.getName();
+            System.out.println("Our  guess = " + ourGuess);
+            System.out.println(sb.toString());
 
             // if the opponent does not have any stamina we attack him no matter what
             if(o.getStaminaPoints() < 1){
                 return whichAttackToUse(attackCards, a, o, sb, new CardRest());
             }
-            Instance i = new Instance(1.0, values.clone());
-            i.setDataset(dataset);
-            int out = (int)classifier_.classifyInstance(i);
-            Card selected = allCards.get(out);
-            String ourGuess = selected.getName();
-            System.out.println("Our  guess = " + selected.getName());
 
             // What to do if opponent attacks
             Card.CardActionType cardType = selected.getType();
@@ -274,14 +279,14 @@ public class AgentFresco extends Agent {
                         return whichAttackToUse(attackCards, a, o, sb, selected);
                     } else {
 //                        System.out.println("Dodge dip duck dive and dodge");
-                        System.out.println(minimizeDistanceCard(moveCards, sb, selected).getName());
+//                        System.out.println(minimizeDistanceCard(moveCards, sb, selected).getName());
                         return minimizeDistanceCard(moveCards, sb, selected); // DANCE, dodge the attack
                     }
                 } else {
 //                    System.out.println("Opponent missing his attack, attack him ");
-                    System.out.println(whichAttackToUse(attackCards, a, o, sb, selected).getName());
+//                    System.out.println(whichAttackToUse(attackCards, a, o, sb, selected).getName());
                     if(whichAttackToUse(attackCards, a, o, sb, selected).getName().equals("cRest")){
-                        System.out.println("if attack to use != rest");
+//                        System.out.println("if attack to use != rest");
                         return minimizeDistanceCard(moveCards, sb, selected);
                     }
                     return whichAttackToUse(attackCards, a, o, sb, selected);
@@ -298,9 +303,9 @@ public class AgentFresco extends Agent {
             //if opponent is moving
             } else if (cardType.equals(Card.CardActionType.ctMove)) { // Opponent about to move
                 if(selected.getName().equals("cRest")){
-                    System.out.println("tessi if setning gaeti verid vitlaus");
+//                    System.out.println("tessi if setning gaeti verid vitlaus");
                     if(whichAttackToUse(attackCards, a, o, sb, selected).getName().equals("cRest")){
-                        System.out.println("er tad ad skila okkur resT???" + minimizeDistanceCard(moveCards, sb, selected).getName());
+//                        System.out.println("er tad ad skila okkur resT???" + minimizeDistanceCard(moveCards, sb, selected).getName());
                         return minimizeDistanceCard(moveCards, sb, selected);
                     } else{
                         return whichAttackToUse(attackCards, a, o, sb, selected);

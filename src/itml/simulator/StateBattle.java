@@ -10,6 +10,7 @@ package itml.simulator;
  * @version     %I%, %G%
  *
  */
+import itml.agents.AgentFresco;
 import itml.cards.Card;
 
 public class StateBattle {
@@ -178,7 +179,7 @@ public class StateBattle {
            System.out.println( "A: " + a + " stamina: " + m_stateAgent[a].getStaminaPoints()
                                          + " health: " + m_stateAgent[a].getHealthPoints()
                                          + " lastmove: " + ((m_lastMove[a] == null) ? "n/a" : m_lastMove[a].getName() ) );
-        }        
+        }
         return text.toString();
         
     }
