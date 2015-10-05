@@ -104,7 +104,7 @@ public class BattleSim {
         Agent[] agentsSparringPartners = {
                 new AgentChicken( deck.clone(), msConstruct, msPerMove, msLearning ),
                 new AgentRandom( deck.clone(), msConstruct, msPerMove, msLearning ),
-                new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning )
+                new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning ),
         };
         Instances instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
                 agentOpp, agentsSparringPartners );
