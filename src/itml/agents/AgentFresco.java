@@ -236,6 +236,11 @@ public class AgentFresco extends Agent {
                     throw new Exception("Unknown type of card");
                 }
             }
+
+            System.out.println();
+            System.out.println("A col row : " + a.getCol() + " " + a.getRow());
+            System.out.println("O col row : " + o.getCol() + " " + o.getRow());
+
             // if the opponent does not have any stamina we attack him no matter what
             if(o.getStaminaPoints() < 1){
                 return whichAttackToUse(attackCards, a, o, sb, new CardRest());
