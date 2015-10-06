@@ -82,8 +82,14 @@ public class BattleSim {
         int MAX_HEALTH = 3, MIN_HEALTH = 1;
         int MAX_STAM = 10, MIN_STAM = 0;
 
-        stateAgents[0] =  new StateAgent(1, 2 , 10, 3);
-        stateAgents[1] =  new StateAgent(3, 2 , 10, 3);
+        stateAgents[0] =  new StateAgent( ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                                           ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                                            ((int) (Math.random()*(MAX_HEALTH - MIN_HEALTH))) + MIN_HEALTH,
+                                                            ((int) (Math.random()*(MAX_STAM - MIN_STAM))) + MIN_STAM);
+        stateAgents[1] =  new StateAgent( ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                                            ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                                            ((int) (Math.random()*(MAX_HEALTH - MIN_HEALTH))) + MIN_HEALTH,
+                                                            ((int) (Math.random()*(MAX_STAM - MIN_STAM))) + MIN_STAM);
         // endregion
 
 //        stateAgents[0] =  new StateAgent( 1, 2, 10, 3 );
@@ -104,7 +110,7 @@ public class BattleSim {
 
         msStart = System.currentTimeMillis();
         // The second agent is your opponent.
-        Agent agentOpp = new AgentTerminator ( deck.clone(), msConstruct, msPerMove, msLearning );
+        Agent agentOpp = new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning );
         msDuration = System.currentTimeMillis() - msStart;
         System.out.println("Timing agent constructor = " + msDuration );
         if ( msDuration > msConstruct ) {
