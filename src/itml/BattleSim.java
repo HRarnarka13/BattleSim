@@ -105,6 +105,7 @@ public class BattleSim {
                 new AgentChicken( deck.clone(), msConstruct, msPerMove, msLearning ),
                 new AgentRandom( deck.clone(), msConstruct, msPerMove, msLearning ),
                 new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning ),
+                new AgentFresco( deck.clone(), msConstruct, msPerMove, msLearning )
         };
         Instances instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
                 agentOpp, agentsSparringPartners );
@@ -139,7 +140,7 @@ public class BattleSim {
             int  indexOppAgent = (indexMyAgent == 0) ? 1 : 0;
             agents[indexMyAgent] = agentMy;
             agents[indexOppAgent] = agentOpp;
-            battle.run( true, numStepsInGame, msPerMove, agents, score, log );
+            battle.run(true, numStepsInGame, msPerMove, agents, score, log);
             scoreMy += score[indexMyAgent];
             scoreOpp += score[indexOppAgent];
             System.out.println( "My score = " + scoreMy + "  Opponent score = " + scoreOpp );
