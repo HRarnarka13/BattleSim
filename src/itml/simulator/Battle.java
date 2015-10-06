@@ -101,7 +101,8 @@ public class Battle {
             agents[a].startGame( a, (StateBattle) bs.clone() );
             long msDuration = System.currentTimeMillis() - msStart;
             if ( msDuration > msPerMove ) {
-                System.out.println("WARNING: Agent " + a + " exceeded time limit in startGame("+msDuration+">"+ msPerMove+")");
+                System.out.println("WARNING: Agent " + a +
+                        " exceeded time limit in startGame("+msDuration+">"+ msPerMove+")");
             }
             score[a] = 0.0;
         }
@@ -120,7 +121,8 @@ public class Battle {
                     Card cardAgent = agents[a].act( (StateBattle) bs.clone() );
                     long msDuration = System.currentTimeMillis() - msStart;
                     if ( msDuration > msPerMove ) {
-                       System.out.println("WARNING: Agent " + a + " exceeded time limit in act ("+msDuration+">"+ msPerMove+")");
+                       System.out.println("WARNING: Agent " + a +
+                                " exceeded time limit in act ("+msDuration+">"+ msPerMove+")");
                     }
                     if ( cardAgent == null ) {
                         System.out.println( "Quitting ..." );
@@ -174,7 +176,8 @@ public class Battle {
             agents[a].endGame( (StateBattle) bs.clone(), score );
             long msDuration = System.currentTimeMillis() - msStart;
             if ( msDuration > msPerMove ) {
-                System.out.println("WARNING: Agent " + a + " exceeded time limit in endGame("+msDuration+">"+ msPerMove+")");
+                System.out.println("WARNING: Agent " + a +
+                        " exceeded time limit in endGame("+msDuration+">"+ msPerMove+")");
             }
         }
     }

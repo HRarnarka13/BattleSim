@@ -104,13 +104,10 @@ public class AgentFresco extends Agent {
             bs.play(move);
             // if this move  does not reduce our healthpoints we add to the list
             int healthPointAfterMove = bs.getAgentState(m_noThisAgent).getHealthPoints();
-            if (currentHealthPoints == healthPointAfterMove) {
+            if (currentHealthPoints == healthPointAfterMove ) {
                safeZoneCards.add(card);
-//                bestCard = card;
-//                bestDistance = distance;
             }
         }
-//        System.out.println("Number of safe zone cards" + safeZoneCards.size());
         Card bestCard = safeZoneCards.get(0);
         int bestDistance = distanceBetweenAgents(sb);
         for(Card c : safeZoneCards){
@@ -208,9 +205,7 @@ public class AgentFresco extends Agent {
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
-          classifier_ = new J48();
-//        classifier_ = new AdaBoostM1();
-//        classifier_.
+        classifier_ = new J48();
 //          classifier_ = new NaiveBayes();
     }
 
@@ -248,7 +243,7 @@ public class AgentFresco extends Agent {
         boolean foundOpponentCard = false;
         Card opponentCard = null;
         for (Card c : sb.getLastMoves() ) {
-            if (c != null && ourLastMove.getName() != c.getName()) {
+            if (c != null && ourLastMove != null && ourLastMove.getName() != c.getName()) {
                 foundOpponentCard = true;
                 opponentCard = c;
                 System.out.println("Enemy last move " + c.getName());
@@ -266,7 +261,8 @@ public class AgentFresco extends Agent {
                 totalSteps++;
             } else {
                 System.out.println("****************");
-                System.out.println("we failed, opponentCard : " + opponentCard.getName() + " lastPredict : " + lastPredict.getName());
+                System.out.println("we failed, opponentCard : " + opponentCard.getName() + " lastPredict : "
+                                    + lastPredict.getName());
                 System.out.println("****************");
                 totalWrong++;
                 totalSteps++;
