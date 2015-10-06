@@ -8,7 +8,6 @@ import itml.simulator.StateAgent;
 import itml.simulator.StateBattle;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -225,9 +224,9 @@ public class AgentFresco extends Agent {
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
-        classifier_ = new J48();
+//        classifier_ = new J48();
 //        classifier_ = new NaiveBayes();
-//        classifier_ = new MultilayerPerceptron();
+        classifier_ = new J48();
     }
 
     @Override
