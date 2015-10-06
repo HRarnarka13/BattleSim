@@ -8,7 +8,6 @@ import itml.simulator.StateAgent;
 import itml.simulator.StateBattle;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
