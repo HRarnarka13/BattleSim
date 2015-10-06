@@ -84,7 +84,8 @@ public class BattleSim {
         long  msStart, msDuration;
 
         msStart = System.currentTimeMillis();
-        Agent agentMy = new AgentFresco( deck.clone(), msConstruct, msPerMove, msLearning );   // The first agent is yours -- change to yours.
+        // The first agent is yours -- change to yours.
+        Agent agentMy = new AgentFresco( deck.clone(), msConstruct, msPerMove, msLearning );
         msDuration = System.currentTimeMillis() - msStart;
         System.out.println("Timing agent constructor = " + msDuration );
         if ( msDuration > msConstruct ) {
@@ -92,7 +93,8 @@ public class BattleSim {
         }
 
         msStart = System.currentTimeMillis();
-        Agent agentOpp = new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning );   // The second agent is your opponent.
+        // The second agent is your opponent.
+        Agent agentOpp = new AgentTerminator ( deck.clone(), msConstruct, msPerMove, msLearning );
         msDuration = System.currentTimeMillis() - msStart;
         System.out.println("Timing agent constructor = " + msDuration );
         if ( msDuration > msConstruct ) {
@@ -108,6 +110,15 @@ public class BattleSim {
         };
         Instances instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
                 agentOpp, agentsSparringPartners );
+
+        // Now learn from our good shit agent
+        AgentFresco agentFresco = new AgentFresco( deck.clone(), msConstruct, msPerMove, msLearning );
+        agentFresco.learn(instances);
+        Agent[] newAgentsSparringPartners = { agentFresco };
+
+        instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
+                agentOpp, newAgentsSparringPartners );
+
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter( "history.arff"));
             writer.write( instances.toString() );
@@ -156,7 +167,8 @@ public class BattleSim {
      * @param  battle            An battle object, specifying the arena setup.
      * @param  numTrainingGames  An integer representing the number of training games to run.
      * @param  numStepsInGame    An integer representing the maximum number of steps (turns) in a game.
-     * @param  msPerMove         An integer representing the maximum time (in milliseconds) an agent can take for an action.
+     * @param  msPerMove         An integer representing the maximum time (in milliseconds) an agent can take
+     *                           for an action.
      * @param  agent             The agent that will be matched against the different sparring partners.
      * @param  agentsSparring    An array with the sparring partner agents.
      *

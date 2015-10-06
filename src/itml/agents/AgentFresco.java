@@ -8,6 +8,7 @@ import itml.simulator.StateAgent;
 import itml.simulator.StateBattle;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.meta.MultiBoostAB;
 import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -207,8 +208,24 @@ public class AgentFresco extends Agent {
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
-          classifier_ = new J48();
-        classifier_.;
+         classifier_ = new J48();
+//        MultiBoostAB ada = new MultiBoostAB();
+//        String a[] = new String[8];
+//        a[0] = "-P";
+//        a[1] = "100";
+//        a[2] = "-S";
+//        a[3] = "1";
+//        a[4] = "-I";
+//        a[5] = "150";
+//        a[6] = "-W";
+//        a[7] = "weka.classifiers.trees.J48";
+//        try {
+//            ada.setOptions(a);
+//            classifier_ = ada;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
 //          classifier_ = new NaiveBayes();
     }
 
@@ -264,7 +281,8 @@ public class AgentFresco extends Agent {
                 totalSteps++;
             } else {
                 System.out.println("****************");
-                System.out.println("we failed, opponentCard : " + opponentCard.getName() + " lastPredict : " + lastPredict.getName());
+                System.out.println("we failed, opponentCard : " + opponentCard.getName() + " lastPredict : "
+                                    + lastPredict.getName());
                 System.out.println("****************");
                 totalWrong++;
                 totalSteps++;
