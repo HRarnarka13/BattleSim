@@ -82,14 +82,8 @@ public class BattleSim {
         int MAX_HEALTH = 3, MIN_HEALTH = 1;
         int MAX_STAM = 10, MIN_STAM = 0;
 
-        stateAgents[0] =  new StateAgent( ((int) (Math.random()*(MAX - MIN))) + MIN,
-                                            ((int) (Math.random()*(MAX - MIN))) + MIN,
-                                            ((int) (Math.random()*(MAX_HEALTH - MIN_HEALTH))) + MIN_HEALTH,
-                                            ((int) (Math.random()*(MAX_STAM - MIN_STAM))) + MIN_STAM);
-        stateAgents[1] =  new StateAgent( ((int) (Math.random()*(MAX - MIN))) + MIN,
-                                            ((int) (Math.random()*(MAX - MIN))) + MIN,
-                                            ((int) (Math.random()*(MAX_HEALTH - MIN_HEALTH))) + MIN_HEALTH,
-                                            ((int) (Math.random()*(MAX_STAM - MIN_STAM))) + MIN_STAM);
+        stateAgents[0] =  new StateAgent(1, 2 , 10, 3);
+        stateAgents[1] =  new StateAgent(3, 2 , 10, 3);
         // endregion
 
 //        stateAgents[0] =  new StateAgent( 1, 2, 10, 3 );
@@ -179,29 +173,29 @@ public class BattleSim {
             battle.run( true, numStepsInGame, msPerMove, agents, score, log );
 
             // region our stuff
-//            double[] values = new double[game_instances.numAttributes()];
-//            boolean firstPass = true;
-//            StateAgent a = null, o = null;
-//            for ( StateBattle bs : log.getLog() ) {
-//                //System.out.println( bs.toString() );
-//                if ( firstPass ) {
-//                    firstPass = false;
-//                }
-//                else {
-//                    values[0] = a.getCol();
-//                    values[1] = a.getRow();
-//                    values[2] = a.getHealthPoints();
-//                    values[3] = a.getStaminaPoints();
-//                    values[4] = o.getCol();
-//                    values[5] = o.getRow();
-//                    values[6] = o.getHealthPoints();
-//                    values[7] = o.getStaminaPoints();
-//                    values[8] = instances.attribute(8).indexOfValue( bs.getLastMoves()[indexOppAgent].getName() ); // move of agent.
-//                    game_instances.add( new Instance( 1.0, values.clone() ) );
-//                }
-//                a = bs.getAgentState(indexOppAgent);
-//                o = bs.getAgentState(indexMyAgent);
-//            }
+            double[] values = new double[game_instances.numAttributes()];
+            boolean firstPass = true;
+            StateAgent a = null, o = null;
+            for ( StateBattle bs : log.getLog() ) {
+                //System.out.println( bs.toString() );
+                if ( firstPass ) {
+                    firstPass = false;
+                }
+                else {
+                    values[0] = a.getCol();
+                    values[1] = a.getRow();
+                    values[2] = a.getHealthPoints();
+                    values[3] = a.getStaminaPoints();
+                    values[4] = o.getCol();
+                    values[5] = o.getRow();
+                    values[6] = o.getHealthPoints();
+                    values[7] = o.getStaminaPoints();
+                    values[8] = instances.attribute(8).indexOfValue( bs.getLastMoves()[indexOppAgent].getName() ); // move of agent.
+                    game_instances.add( new Instance( 1.0, values.clone() ) );
+                }
+                a = bs.getAgentState(indexOppAgent);
+                o = bs.getAgentState(indexMyAgent);
+            }
             // endregion
 
             scoreMy += score[indexMyAgent];
