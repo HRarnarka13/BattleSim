@@ -76,8 +76,25 @@ public class BattleSim {
         // Set up the initial state of the agent (location, health- and stamina-points),
         // and create a battle arena (5 x 5).
         StateAgent[] stateAgents = new StateAgent[2];
-        stateAgents[0] =  new StateAgent( 1, 2, 10, 3 );
-        stateAgents[1] =  new StateAgent( 3, 2, 10, 3 );
+
+        // region OUR STUFF
+
+        int MAX = 4, MIN = 0;
+        int MAX_HEALTH = 10, MIN_HEALTH = 1;
+        int MAX_STAM = 3, MIN_STAM = 0;
+
+        stateAgents[0] =  new StateAgent( ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                            ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                            ((int) (Math.random()*(MAX_HEALTH - MIN_HEALTH))) + MIN_HEALTH,
+                                            ((int) (Math.random()*(MAX_STAM - MIN_STAM))) + MIN_STAM);
+        stateAgents[1] =  new StateAgent( ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                            ((int) (Math.random()*(MAX - MIN))) + MIN,
+                                            ((int) (Math.random()*(MAX_HEALTH - MIN_HEALTH))) + MIN_HEALTH,
+                                            ((int) (Math.random()*(MAX_STAM - MIN_STAM))) + MIN_STAM);
+        // endregion
+
+//        stateAgents[0] =  new StateAgent( 1, 2, 10, 3 );
+//        stateAgents[1] =  new StateAgent( 3, 2, 10, 3 );
         Battle battle = new Battle( 5, 5, deck, stateAgents);
 
         // Create agents that will compete.
@@ -105,19 +122,23 @@ public class BattleSim {
         // for that we have the opponent play multiple matches against various sparring partners.
         Agent[] agentsSparringPartners = {
                 new AgentChicken( deck.clone(), msConstruct, msPerMove, msLearning ),
+                new AgentLazy( deck.clone(), msConstruct, msPerMove, msLearning ),
                 new AgentRandom( deck.clone(), msConstruct, msPerMove, msLearning ),
                 new AgentTerminator( deck.clone(), msConstruct, msPerMove, msLearning ),
         };
+
         Instances instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
                 agentOpp, agentsSparringPartners );
 
+        // region OUR STUFF
         // Now learn from our good shit agent
-        AgentFresco agentFresco = new AgentFresco( deck.clone(), msConstruct, msPerMove, msLearning );
-        agentFresco.learn(instances);
-        Agent[] newAgentsSparringPartners = { agentFresco };
-
-        instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
-                agentOpp, newAgentsSparringPartners );
+//        AgentFresco agentFresco = new AgentFresco( deck.clone(), msConstruct, msPerMove, msLearning );
+//        agentFresco.learn(instances);
+//        Agent[] newAgentsSparringPartners = { agentFresco };
+//
+//        instances = generateTrainingData( battle, numTrainingGames, numStepsInGame, msPerMove,
+//                agentOpp, newAgentsSparringPartners );
+        // endregion
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter( "history.arff"));
@@ -144,6 +165,11 @@ public class BattleSim {
         double [] score = new double[2];
         double scoreMy = 0.0;
         double scoreOpp = 0.0;
+
+        // region our stuff
+        Instances game_instances = createInstances( battle.getDeck() );
+        // endregion
+
         GameLog log = new GameLog();
         for ( int n=0; n < numPlayingGames ; n++ ) {
             int  indexMyAgent  = n % 2;
@@ -151,6 +177,33 @@ public class BattleSim {
             agents[indexMyAgent] = agentMy;
             agents[indexOppAgent] = agentOpp;
             battle.run( true, numStepsInGame, msPerMove, agents, score, log );
+
+            // region our stuff
+//            double[] values = new double[game_instances.numAttributes()];
+//            boolean firstPass = true;
+//            StateAgent a = null, o = null;
+//            for ( StateBattle bs : log.getLog() ) {
+//                //System.out.println( bs.toString() );
+//                if ( firstPass ) {
+//                    firstPass = false;
+//                }
+//                else {
+//                    values[0] = a.getCol();
+//                    values[1] = a.getRow();
+//                    values[2] = a.getHealthPoints();
+//                    values[3] = a.getStaminaPoints();
+//                    values[4] = o.getCol();
+//                    values[5] = o.getRow();
+//                    values[6] = o.getHealthPoints();
+//                    values[7] = o.getStaminaPoints();
+//                    values[8] = instances.attribute(8).indexOfValue( bs.getLastMoves()[indexOppAgent].getName() ); // move of agent.
+//                    game_instances.add( new Instance( 1.0, values.clone() ) );
+//                }
+//                a = bs.getAgentState(indexOppAgent);
+//                o = bs.getAgentState(indexMyAgent);
+//            }
+            // endregion
+
             scoreMy += score[indexMyAgent];
             scoreOpp += score[indexOppAgent];
             System.out.println( "My score = " + scoreMy + "  Opponent score = " + scoreOpp );
@@ -158,6 +211,19 @@ public class BattleSim {
         }
         System.out.println( "My score = " + scoreMy + "  Opponent score = " + scoreOpp );
         System.out.println();
+
+
+        // region our stuff
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter( "game.arff"));
+            writer.write( game_instances.toString() );
+            writer.close();
+        }
+        catch ( Exception e ) {
+            System.err.println( "Warning: could not write out game.ARFF file");
+        }
+
+        // endregion
     }
 
     /**
@@ -250,7 +316,7 @@ public class BattleSim {
      *
      * @return       WEKA Instances object.
      */
-    static private Instances createInstances( CardDeck deck )
+    static public Instances createInstances( CardDeck deck ) // OUR STUFF changed to public
     {
         FastVector attributes = new FastVector(); // Attributes
         FastVector actions = new FastVector();    // Class
@@ -270,7 +336,7 @@ public class BattleSim {
         attributes.addElement(new Attribute("o_health"));
         attributes.addElement(new Attribute("o_stamina"));
         // Add the class, the action the a_ agent took in the given state (nominal).
-        attributes.addElement(new Attribute("a_action", actions));
+        attributes.addElement(new Attribute("class", actions));
 
         Instances instances = new Instances( "AgentBattleHistory", attributes, 0 );
         instances.setClassIndex(8);

@@ -8,6 +8,8 @@ import itml.simulator.StateAgent;
 import itml.simulator.StateBattle;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.lazy.LBR;
+import weka.classifiers.lazy.LWL;
 import weka.classifiers.meta.MultiBoostAB;
 import weka.classifiers.trees.J48;
 import weka.core.Instance;
@@ -32,6 +34,9 @@ public class AgentFresco extends Agent {
     public int totalCorrect = 0;
     public int totalWrong = 0;
     public int totalSteps = 0;
+    public int totalWrongType = 0;
+    public int totalCorrectType = 0;
+
 
     private final int GRID_SIZE = 4;
     private final int MAXIMUM_STAMINA = 10;
@@ -95,7 +100,7 @@ public class AgentFresco extends Agent {
         StateAgent a = sb.getAgentState(m_noThisAgent);
         int column = a.getCol();
         int row = a.getRow();
-        if(column > 4 || row > 4) {
+        if(column > 4 || row > 4 || column < 0 || row < 0) {
             return true;
         } else {
             return false;
@@ -266,9 +271,14 @@ public class AgentFresco extends Agent {
 
     @Override
     public Card act(StateBattle stateBattle) {
+
+        System.out.println();
+        System.out.println("************" + totalSteps + "*************");
         System.out.println("Total Correct : " + totalCorrect + " Total : " + totalSteps);
-        if (ourLastMove != null)
+        System.out.println("Total type Correct : " + totalCorrectType + " Total : " + totalSteps);
+        if (ourLastMove != null) {
             System.out.println("ourLastMove.getName() = " + ourLastMove.getName());
+        }
 
         StateBattle sb = (StateBattle) stateBattle.clone();   // close the state, as play( ) modifies it.
         System.out.println();
@@ -279,31 +289,37 @@ public class AgentFresco extends Agent {
         boolean foundOpponentCard = false;
         Card opponentCard = null;
         for (Card c : sb.getLastMoves() ) {
-            if (c != null && ourLastMove.getName() != c.getName()) {
+            if (c != null && ourLastMove != null && ourLastMove.getName() != c.getName()) {
                 foundOpponentCard = true;
                 opponentCard = c;
-                System.out.println("Enemy last move " + c.getName());
             }
         }
         if (ourLastMove !=null && foundOpponentCard == false) {
             opponentCard = ourLastMove;
-            System.out.println("Enemy last move = " + ourLastMove.getName());
         }
 
-        if (opponentCard != null && lastPredict != null ) {
-            if (opponentCard.getName().equals(lastPredict.getName())) {
-                System.out.println("we prediceted opponent correctly");
-                totalCorrect++;
-                totalSteps++;
-            } else {
-                System.out.println("****************");
-                System.out.println("we failed, opponentCard : " + opponentCard.getName() + " lastPredict : "
-                                    + lastPredict.getName());
-                System.out.println("****************");
-                totalWrong++;
-                totalSteps++;
-            }
+        if (opponentCard != null) {
+            System.out.println("Enemy last move = " + opponentCard.getName());
         }
+
+
+
+        if (opponentCard != null && lastPredict != null ) {
+            if (opponentCard.getType().equals(lastPredict.getType())) {
+                totalCorrectType++;
+            } else {
+                totalWrongType++;
+            }
+
+            if (opponentCard.getName().equals(lastPredict.getName())) {
+                totalCorrect++;
+            } else {
+                totalWrong++;
+            }
+            System.out.println("OpponentCard: " + opponentCard.getName() + " " + opponentCard.getType().name() +
+                            " LastPredict: " + lastPredict.getName() + " " + lastPredict.getType().name());
+        }
+        totalSteps++;
 
 
         values[0] = a.getCol();
@@ -314,7 +330,7 @@ public class AgentFresco extends Agent {
         values[5] = o.getRow();
         values[6] = o.getHealthPoints();
         values[7] = o.getStaminaPoints();
-        System.out.println("Index our index : " + m_noThisAgent + " Index their index : " + m_noOpponentAgent);
+        System.out.println("AgentFresco : " + m_noThisAgent + " Looser : " + m_noOpponentAgent);
         try {
             ArrayList<Card> allCards = m_deck.getCards(); // all cards
             ArrayList<Card> cards = m_deck.getCards(a.getStaminaPoints());// cards that we have stamina to use
@@ -337,7 +353,6 @@ public class AgentFresco extends Agent {
             Card selected = predictCard(values, allCards);
             lastPredict = selected;
             String ourGuess = selected.getName();
-            System.out.println("Our  guess = " + ourGuess);
             // if the opponent does not have any stamina we attack him no matter what
             if(o.getStaminaPoints() < 1){
                 returnCard = whichAttackToUse(attackCards, a, o, sb, new CardRest());
