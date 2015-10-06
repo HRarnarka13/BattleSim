@@ -1,0 +1,13 @@
+@relation AgentBattleHistory
+
+@attribute a_y numeric
+@attribute a_x numeric
+@attribute a_health numeric
+@attribute a_stamina numeric
+@attribute o_x numeric
+@attribute o_y numeric
+@attribute o_health numeric
+@attribute o_stamina numeric
+@attribute class {cRest,cMoveUp,cMoveDown,cMoveLeft,cMoveRight,cLeapLeft,cLeapRight,cDefend,cAttackCardinal,cAttackDiagonal,cAttackLong}
+
+@data
