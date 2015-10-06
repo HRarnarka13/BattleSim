@@ -225,9 +225,9 @@ public class AgentFresco extends Agent {
 
     public AgentFresco( CardDeck deck, int msConstruct, int msPerMove, int msLearn ) {
         super(deck, msConstruct, msPerMove, msLearn);
-        classifier_ = new J48();
+//        classifier_ = new J48();
 //        classifier_ = new NaiveBayes();
-//        classifier_ = new MultilayerPerceptron();
+        classifier_ = new MultilayerPerceptron();
     }
 
     @Override

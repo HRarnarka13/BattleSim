@@ -104,7 +104,7 @@ public class BattleSim {
 
         msStart = System.currentTimeMillis();
         // The second agent is your opponent.
-        Agent agentOpp = new AgentTerminator ( deck.clone(), msConstruct, msPerMove, msLearning );
+        Agent agentOpp = new AgentChicken ( deck.clone(), msConstruct, msPerMove, msLearning );
         msDuration = System.currentTimeMillis() - msStart;
         System.out.println("Timing agent constructor = " + msDuration );
         if ( msDuration > msConstruct ) {
