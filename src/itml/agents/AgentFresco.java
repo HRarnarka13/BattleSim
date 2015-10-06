@@ -87,6 +87,22 @@ public class AgentFresco extends Agent {
     }
 
     /**
+     * Check if we are on the grid in current state
+     * @param sb state of the battle now
+     * @return true if we are out of bounds, false if we are still on the field
+     */
+    private boolean outOfBounds(StateBattle sb) {
+        StateAgent a = sb.getAgentState(m_noThisAgent);
+        int column = a.getCol();
+        int row = a.getRow();
+        if(column > 4 || row > 4) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Finds the card that brings us closest to the opponent
      * @param availableCards list of currently available cards
      * @param sb current state of battle
@@ -104,7 +120,7 @@ public class AgentFresco extends Agent {
             bs.play(move);
             // if this move  does not reduce our healthpoints we add to the list
             int healthPointAfterMove = bs.getAgentState(m_noThisAgent).getHealthPoints();
-            if (currentHealthPoints == healthPointAfterMove) {
+            if (currentHealthPoints == healthPointAfterMove && !outOfBounds(bs)) {
                safeZoneCards.add(card);
 //                bestCard = card;
 //                bestDistance = distance;
@@ -331,7 +347,7 @@ public class AgentFresco extends Agent {
 
             // What to do if opponent attacks
             Card.CardActionType cardType = selected.getType();
-            if(cardType.equals(Card.CardActionType.ctAttack)) {// Opponent about to attack
+            if (cardType.equals(Card.CardActionType.ctAttack)) {// Opponent about to attack
                 if(opponentAttackWillHit(selected, sb)) {
                     // if we are stronger, attack
                     if (a.getStaminaPoints() > o.getStaminaPoints() && a.getHealthPoints() > o.getHealthPoints()) {
